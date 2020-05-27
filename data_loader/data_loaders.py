@@ -8,7 +8,7 @@ from torchvision import datasets, transforms
 from base import BaseDataLoader
 import torch
 from torch.utils.data import Dataset
-
+from tqdm import tqdm
 
 def collate_fn(batch):
     batch = list(filter(lambda x: x is not None, batch))
@@ -35,6 +35,17 @@ def calculate_valid_crop_size(crop_size, scale_factor):
     return crop_size - (crop_size % scale_factor)
 
 
+def verify(image_filenames, crop_size):
+    final_paths = []
+    for path in tqdm(image_filenames):
+        img = load_img(path)
+        width, height = img.size
+        if width < crop_size or height < crop_size:
+            continue
+        else:
+            final_paths.append(path)
+    return final_paths
+
 class TrainDatasetFromFolder(data.Dataset):
     def __init__(self, image_dirs, is_gray=False, crop_size=192, rotate=True, fliplr=True,
                  fliptb=True, scale_factor=2):
@@ -50,7 +61,7 @@ class TrainDatasetFromFolder(data.Dataset):
         self.fliplr = fliplr
         self.fliptb = fliptb
         self.scale_factor = scale_factor
-
+        self.image_filenames = verify(self.image_filenames, self.crop_size)
 
     def __getitem__(self, index):
 

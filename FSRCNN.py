@@ -182,17 +182,17 @@ if __name__ == "__main__":
 
     if args.checkpoint is None:
         train(
-            args['scale_factor'],
-            args['batch_size'],
-            args['workers'],
-            args['epochs'],
-            args['lr'],
-            args['device']
+            args.scale_factor,
+            args.batch_size,
+            args.workers,
+            args.epochs,
+            args.lr,
+            args.device
         )
     else:
         test(
-            args['scale_factor'],
-            args['workers'],
-            args['epochs'],
-            args['checkpoint']
+            args.scale_factor,
+            args.workers,
+            args.epochs,
+            args.checkpoint
         )

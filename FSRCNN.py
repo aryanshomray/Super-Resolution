@@ -121,7 +121,7 @@ def train(scale_factor, batch_size, num_workers, epochs, lr = 1e-3, device = 'cp
             writer.add_scalar('Metric/PSNR', psnr, epoch)
             writer.add_scalar('METRIC/SSIM', ssim, epoch)
 
-        torch.save(model.load_state_dict(),os.path.join('Logs', FILENAME, f'Epoch_{epoch}.pth'))
+        torch.save(model.state_dict(),os.path.join('Logs', FILENAME, f'Epoch_{epoch}.pth'))
 
     writer.close()
 

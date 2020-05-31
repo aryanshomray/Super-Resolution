@@ -175,7 +175,9 @@ if __name__ == "__main__":
     
     args = p.parse_args()
 
-    FILENAME = f'FSRCNN_{args['scale_factor']}x_BS_{args['batch_size']}_workers_{args['workers']}_epochs_{args['epochs']}_lr{args['lr']}_{np.random.random()}'
+
+
+    FILENAME = f'FSRCNN_{args.scale_factor}x_BS_{args.batch_size}_workers_{args.workers}_epochs_{args.epochs}_lr{args.lr}_{np.random.random()}'
     os.mkdir(os.path.join('Logs', FILENAME))
 
     if args['checkpoint'] is None:

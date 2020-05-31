@@ -7,8 +7,7 @@ testdata
 testing.ipynb
 # C extensions
 *.so
-data
-!data
+
 # Distribution / packaging
 .Python
 env/

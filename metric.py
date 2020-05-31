@@ -77,7 +77,8 @@ def ssim(img1, img2, window_size=11, size_average=True):
     #print("ssim: ", img1.shape)
     _, channel, _, _ = img1.shape
     window = create_window(window_size, channel)
-
+    img1 *=255
+    img2 *=255
     if img1.is_cuda:
         window = window.cuda(img1.get_device())
     window = window.type_as(img1)
@@ -86,8 +87,8 @@ def ssim(img1, img2, window_size=11, size_average=True):
 
 
 def PSNR(img1, img2):
-    img1 = img1.detach().cpu().numpy().astype(np.float64)
-    img2 = img2.detach().cpu().numpy().astype(np.float64)
+    img1 = img1.cpu().numpy().astype(np.float64)
+    img2 = img2.cpu().numpy().astype(np.float64)
     mse = np.mean((img1 - img2) ** 2)
     if mse == 0:
         return 0

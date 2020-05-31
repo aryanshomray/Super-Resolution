@@ -165,13 +165,13 @@ if __name__ == "__main__":
 
     p = argparse.ArgumentParser()
 
-    p.add_argument('scale_factor',default=2,type=int)
-    p.add_argument('epochs',default=100,type=int)
-    p.add_argument('workers',default=80,type=int)
-    p.add_argument('batch_size',default=256,type=int)
-    p.add_argument('lr',default=1e-3,type=float)
-    p.add_argument('device',default='cpu',type=str)
-    p.add_argument('checkpoint',default=None,type=str)
+    p.add_argument('scale_factor',default=2,type=int, required=False)
+    p.add_argument('epochs',default=100,type=int, required=False)
+    p.add_argument('workers',default=80,type=int, required=False)
+    p.add_argument('batch_size',default=256,type=int, required=False)
+    p.add_argument('lr',default=1e-3,type=float, required=False)
+    p.add_argument('device',default='cpu',type=str, required=False)
+    p.add_argument('checkpoint',default=None,type=str, required=False)
     
     args = p.parse_args()
 

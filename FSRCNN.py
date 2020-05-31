@@ -132,7 +132,7 @@ def test(scale_factor, num_workers, path):
     for testfile in testfiles:
         
         writer = SummaryWriter(log_dir=os.path.join('Logs',FILENAME,'Test',testfile))
-        Dataset = Image_Dataset(scale_factor = scale_factor, False, testfile)
+        Dataset = Image_Dataset(scale_factor = scale_factor, train = False, filenae=testfile)
         Dataloader = torch.utils.data.DataLoader(Dataset, 1, False, num_workers=num_workers)
 
         model = FSRCNN(scale_factor=scale_factor)

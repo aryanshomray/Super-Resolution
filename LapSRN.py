@@ -160,19 +160,18 @@ class Image_Dataset(torch.utils.data.Dataset):
 
 
 
-def train(scale_factor, batch_size, num_workers, epochs, lr = 1e-3, device = 'cpu', save_every = 10):
+def train(batch_size, num_workers, epochs, lr = 1e-3, device = 'cpu', save_every = 10):
     #Tensorboard Summary Writer Initialization
     writer = SummaryWriter(log_dir=os.path.join('Logs',FILENAME))
 
-    Dataset = Image_Dataset(scale_factor = scale_factor)
+    Dataset = Image_Dataset()
     Dataloader = torch.utils.data.DataLoader(Dataset, batch_size, False, num_workers=num_workers)
 
-    model = LapSRN(scale_factor=scale_factor).to(device)
+    model = LapSRN().to(device)
     model.train()
 
     optimizer = torch.optim.Adam(model.parameters(), lr)
 
-    writer.add_scalar('Scale_Factor', scale_factor)
     writer.add_scalar('Epochs', epochs)
     writer.add_scalar('Batch_Size', batch_size)
     writer.add_scalar('LR', lr)
@@ -217,26 +216,25 @@ def train(scale_factor, batch_size, num_workers, epochs, lr = 1e-3, device = 'cp
             writer.add_scalar('Metric/8x/PSNR', psnr3, epoch)
             writer.add_scalar('Metric/8x/SSIM', ssim3, epoch)
         
-        if epoch==0 and epoch%save_every==0:
+        if epoch!=0 and epoch%save_every==0:
             torch.save(model.state_dict(),os.path.join('Logs', FILENAME, f'Epoch_{epoch}.pth'))
 
     writer.close()
 
-def test(scale_factor, num_workers, path, device = 'cpu'):
+def test(num_workers, path, device = 'cpu'):
 
     testfiles = os.listdir('testdata')
     
     for testfile in testfiles:
         
         writer = SummaryWriter(log_dir=os.path.join('Logs',FILENAME,'Test',testfile))
-        Dataset = Image_Dataset(scale_factor = scale_factor, train = False, filenae=testfile)
+        Dataset = Image_Dataset(train = False, filename=testfile)
         Dataloader = torch.utils.data.DataLoader(Dataset, 1, False, num_workers=num_workers)
 
-        model = LapSRN(scale_factor=scale_factor)
+        model = LapSRN()
         model.load_state_dict(torch.load(path))
-        mode.eval()
+        model.eval()
 
-        writer.add_scalar('Scale_Factor', scale_factor)
 
         with torch.no_grad():
             for idx, (input, target1, target2, target3) in enumerate(Dataloader):
@@ -246,16 +244,11 @@ def test(scale_factor, num_workers, path, device = 'cpu'):
                 target2 = target2.to(device)
                 target3 = target3.to(device)
 
-                if not epoch and not idx:
-                    writer.add_graph(model, input)
 
                 print(idx)
 
-                optimizer.zero_grad()
                 HR1,HR2,HR3 = model(input)
                 loss = F.mse_loss(HR1, target1) + F.mse_loss(HR2, target2) + F.mse_loss(HR3, target3)
-                loss.backward()
-                optimizer.step()
 
 
                 psnr1 = PSNR(target1.detach(), HR1.detach())
@@ -267,16 +260,16 @@ def test(scale_factor, num_workers, path, device = 'cpu'):
                 ssim3 = SSIM(target3.detach(), HR3.detach())
 
 
-                writer.add_scalar('Loss', loss.item(), epoch)
+                writer.add_scalar('Loss', loss.item())
 
-                writer.add_scalar('Metric/2x/PSNR', psnr1, epoch)
-                writer.add_scalar('Metric/2x/SSIM', ssim1, epoch)
+                writer.add_scalar('Metric/2x/PSNR', psnr1)
+                writer.add_scalar('Metric/2x/SSIM', ssim1)
 
-                writer.add_scalar('Metric/4x/PSNR', psnr2, epoch)
-                writer.add_scalar('Metric/4x/SSIM', ssim2, epoch)
+                writer.add_scalar('Metric/4x/PSNR', psnr2)
+                writer.add_scalar('Metric/4x/SSIM', ssim2)
 
-                writer.add_scalar('Metric/8x/PSNR', psnr3, epoch)
-                writer.add_scalar('Metric/8x/SSIM', ssim3, epoch)
+                writer.add_scalar('Metric/8x/PSNR', psnr3)
+                writer.add_scalar('Metric/8x/SSIM', ssim3)
 
         writer.close()
 
@@ -285,7 +278,6 @@ if __name__ == "__main__":
 
     p = argparse.ArgumentParser()
 
-    p.add_argument('--scale_factor',default=2,type=int, required=False)
     p.add_argument('--epochs',default=100,type=int, required=False)
     p.add_argument('--workers',default=80,type=int, required=False)
     p.add_argument('--batch_size',default=256,type=int, required=False)
@@ -303,7 +295,6 @@ if __name__ == "__main__":
 
     if args.checkpoint is None:
         train(
-            args.scale_factor,
             args.batch_size,
             args.workers,
             args.epochs,
@@ -313,9 +304,7 @@ if __name__ == "__main__":
         )
     else:
         test(
-            args.scale_factor,
             args.workers,
-            args.epochs,
             args.checkpoint,
             args.device
         )

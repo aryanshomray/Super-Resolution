@@ -80,7 +80,7 @@ class Image_Dataset(torch.utils.data.Dataset):
 
 
 
-def train(scale_factor, batch_size, num_workers, epochs, lr = 1e-3, device = 'cpu', save_every = 10):
+def train(scale_factor, batch_size, num_workers, epochs, lr = 1e-3, device = 'cpu', save_every = 50):
     #Tensorboard Summary Writer Initialization
     writer = SummaryWriter(log_dir=os.path.join('Logs',FILENAME))
 
@@ -98,6 +98,7 @@ def train(scale_factor, batch_size, num_workers, epochs, lr = 1e-3, device = 'cp
     writer.add_scalar('LR', lr)
 
     for epoch in range(epochs):
+        print(epoch)
         for idx, (input, target) in enumerate(Dataloader):
 
             input = input.to(device)
@@ -106,7 +107,6 @@ def train(scale_factor, batch_size, num_workers, epochs, lr = 1e-3, device = 'cp
             if not epoch and not idx:
                 writer.add_graph(model, input)
 
-            print(idx)
 
             optimizer.zero_grad()
             output = model(input)
@@ -121,12 +121,12 @@ def train(scale_factor, batch_size, num_workers, epochs, lr = 1e-3, device = 'cp
             writer.add_scalar('Metric/PSNR', psnr, epoch)
             writer.add_scalar('METRIC/SSIM', ssim, epoch)
         
-        if epoch==0 and epoch%save_every==0:
+        if epoch!=0 and epoch%save_every==0:
             torch.save(model.state_dict(),os.path.join('Logs', FILENAME, f'Epoch_{epoch}.pth'))
 
     writer.close()
 
-def test(scale_factor, num_workers, path):
+def test(scale_factor, num_workers, path, device):
 
     testfiles = os.listdir('testdata')
     
@@ -197,5 +197,6 @@ if __name__ == "__main__":
             args.scale_factor,
             args.workers,
             args.epochs,
-            args.checkpoint
+            args.checkpoint,
+            args.device
         )

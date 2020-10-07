@@ -215,7 +215,7 @@ def train(batch_size, num_workers, epochs, lr = 1e-3, device = 'cpu', save_every
             writer.add_scalar('Metric/8x/PSNR', psnr3, epoch)
             writer.add_scalar('Metric/8x/SSIM', ssim3, epoch)
         
-        if epoch!=0 and epoch%save_every==0:
+        if epoch%save_every==0:
             torch.save(model.state_dict(),os.path.join('Logs', FILENAME, f'Epoch_{epoch}.pth'))
 
     writer.close()

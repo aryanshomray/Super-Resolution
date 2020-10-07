@@ -19,13 +19,12 @@ from metric import ssim as SSIM, PSNR
 def upsample_filt(size):
 
     factor = (size + 1) // 2
-    if size % 2 == 1:
+    if (size & 1 == 1):
         center = factor - 1
     else:
-        center = factor - 0.5
+        center = factor - 1/2
     og = np.ogrid[:size, :size]
-    return (1 - abs(og[0] - center) / factor) * \
-           (1 - abs(og[1] - center) / factor)
+    return (1 - abs(og[0] - center) / factor) * (1 - abs(og[1] - center) / factor)
 
 
 def bilinear_upsample_weights(filter_size, weights):
